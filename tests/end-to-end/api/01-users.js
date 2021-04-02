@@ -2696,6 +2696,39 @@ describe('[Users]', function() {
 				})
 				.end(done);
 		});
+		it('should return an error when getting status without logging in', (done) => {
+			request.get(api('users.getStatus?userId=rocket.cat'))
+				.expect('Content-Type', 'application/json')
+				.expect(401)
+				.expect((res) => {
+					expect(res.body).to.have.property('status', 'error');
+					expect(res.body).to.have.property('message', 'You must be logged in to do this.');
+				})
+				.end(done);
+		});
+		it('should return an error when getting status of unknown user', (done) => {
+			request.get(api('users.getStatus?userId=rocket.cat'))
+				.expect('Content-Type', 'application/json')
+				.expect(401)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('error', 'The optional \"userId\" param provided does not match any users [error-invalid-user]');
+					expect(res.body).to.have.property('errorType', 'error-invalid-user');
+				})
+				.end(done);
+		});
+		it('should return other user status even if other field is wrong', (done) => {
+			request.get(api('users.getStatus?userId=rocket.cat&username=wrongwrong'))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('status');
+					expect(res.body._id).to.be.equal('rocket.cat');
+				})
+				.end(done);
+		});
 	});
 
 	describe('[/users.setStatus]', () => {
