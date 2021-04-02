@@ -2709,7 +2709,7 @@ describe('[Users]', function() {
 		it('should return an error when getting status of unknown user', (done) => {
 			request.get(api('users.getStatus?userId=rocket.cat'))
 				.expect('Content-Type', 'application/json')
-				.expect(401)
+				.expect(400)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', false);
 					expect(res.body).to.have.property('error', 'The optional \"userId\" param provided does not match any users [error-invalid-user]');
@@ -2717,7 +2717,7 @@ describe('[Users]', function() {
 				})
 				.end(done);
 		});
-		it('should return other user status even if other field is wrong', (done) => {
+		it('should return other user status even if username field is wrong', (done) => {
 			request.get(api('users.getStatus?userId=rocket.cat&username=wrongwrong'))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
